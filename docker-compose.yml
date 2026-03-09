@@ -1,0 +1,66 @@
+name: event-driven-order-platform
+
+services:
+  kafka:
+    image: confluentinc/cp-kafka:7.8.6
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      # Enable KRaft mode so Kafka can run without ZooKeeper.
+      KAFKA_KRAFT_MODE: "true"
+
+      # Static cluster id for local development.
+      CLUSTER_ID: "123LKwwe9-kl48--xi23"
+
+      # Single-node broker/controller setup for local development only.
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+
+      # Topic durability settings kept minimal for a single local broker.
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+      # Internal Docker listener:
+      #   - kafka:9092 for containers inside the Compose network
+      #
+      # Host listener:
+      #   - localhost:29092 for scripts running directly on the host machine
+      #
+      # Controller listener:
+      #   - kafka:9093 for internal KRaft controller traffic
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092"
+
+      # Map listener names to security protocols.
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT"
+
+      # Broker-to-broker communication uses the internal Docker listener.
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+
+      # KRaft controller listener name.
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+
+      # Kafka data/log directory inside the container.
+      KAFKA_LOG_DIRS: "/tmp/kraft-combined-logs"
+
+    volumes:
+      - kafka_kraft:/var/lib/kafka/data
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      # Human-readable name shown in the Kafka UI dashboard.
+      KAFKA_CLUSTERS_0_NAME: "local"
+
+      # Kafka UI runs inside Docker, so it must use the internal broker address.
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:9092"
+    depends_on:
+      - kafka
+
+volumes:
+  kafka_kraft:

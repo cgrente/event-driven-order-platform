@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OrderCreated",
+  "description": "Schema for an order-created event published to the orders topic.",
+  "type": "object",
+  "required": [
+    "orderId",
+    "orderDate",
+    "user",
+    "item",
+    "quantity"
+  ],
+  "properties": {
+    "orderId": {
+      "type": "string",
+      "description": "Unique identifier for the order."
+    },
+    "orderDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp representing when the order was created."
+    },
+    "user": {
+      "type": "string",
+      "description": "Name or identifier of the user who placed the order."
+    },
+    "item": {
+      "type": "string",
+      "description": "Ordered item name."
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Requested quantity for the item."
+    }
+  },
+  "additionalProperties": false
+}
