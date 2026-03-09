@@ -36,13 +36,14 @@ It is not intended to be production-ready, but it is intentionally structured to
 +------------------+         +------------------+         +----------------------+
 |   order-service  | ----->  |      Kafka       | ----->  |   tracker-service    |
 |   producer.py    |         |   topic: orders  |         |     tracker.py       |
-+------------------+         +------------------+         +----------------------+
++------------------+         +------------------+         |     notifier.py      |
+                                      |                    +----------------------+
                                       |
                                       v
-                               +--------------+
-                               |   Kafka UI   |
-                               | localhost:8080
-                               +--------------+
+                               +----------------+
+                               |   Kafka UI     |
+                               | localhost:8080 |
+                               +----------------+
 ```
 ---
 Tech stack
